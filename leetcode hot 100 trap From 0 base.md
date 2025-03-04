@@ -379,3 +379,70 @@ public:
 
 
 
+## p7[接雨水](https://leetcode.cn/problems/trapping-rain-water/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 动态规划
+// 思路需要想到如何算每个柱子的雨水
+//对于下标 i，下雨后水能到达的最大高度等于下标 i 两边的最大高度的最小值，下标 i 处能接的雨水量等于下标 i 处的水能到达的最大高度减去 height[i]。
+// 创建两个长度为 n 的数组 leftMax 和 rightMax。对于 0≤i<n，leftMax[i] 表示下标 i 及其左边的位置中，height 的最大高度，rightMax[i] 表示下标 i 及其右边的位置中，height 的最大高度。
+
+class Solution {
+public:
+    // 思路：当前柱子的水量为此柱子左边最高柱子和右边最高柱子的小值减去height【i】
+    // 即water[i]= min(leftmax,rightmax)-height[i]
+    // 运用动态规划逐个求每个i的leftmax(<=i),rightmax(>i)
+    int trap(vector<int>& height) {
+        if(height.size()==0)    return 0;
+        int left=0,right=height.size()-1;
+        vector<int> leftmax(right+1);
+        vector<int> rightmax(right+1);
+        leftmax[0]=height[0];
+        rightmax[right]=height[right];
+        int ans=0;
+        for(int i=1;i<height.size();i++)
+        {
+            leftmax[i]=max(leftmax[i-1],height[i]);
+        }
+        for(int j=right-1;j>=0;j--)
+        {
+            rightmax[j]=max(rightmax[j+1],height[j]);
+        }
+        for(int i=0;i<height.size();i++)
+        {
+            ans+=min(leftmax[i],rightmax[i])-height[i];
+        }
+        return ans;
+    }
+};
+
+// 双指针优化上述leftmax和rightmax的空间数组值
+可算看懂了，原来双指针同时开两个柱子接水。大家题解没说清楚，害得我也没看懂。 对于每一个柱子接的水，那么它能接的水=min(左右两边最高柱子）-当前柱子高度，这个公式没有问题。同样的，两根柱子要一起求接水，同样要知道它们左右两边最大值的较小值。
+
+问题就在这，假设两柱子分别为 i，j。那么就有 iLeftMax,iRightMax,jLeftMx,jRightMax 这个变量。由于 j>i ，故 jLeftMax>=iLeftMax，iRigthMax>=jRightMax.
+
+那么，如果 iLeftMax>jRightMax，则必有 jLeftMax >= jRightMax，所有我们能接 j 点的水。
+
+如果 jRightMax>iLeftMax，则必有 iRightMax >= iLeftMax，所以我们能接 i 点的水。
+
+而上面我们实际上只用到了 iLeftMax，jRightMax 两个变量，故我们维护这两个即可。                                                             
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        if(height.size()==0)    return 0;
+        int left=0,right=height.size()-1;
+        int leftmax=0,rightmax=0;
+        int ans=0;
+        while(left<right)
+        {
+            leftmax=max(leftmax,height[left]);
+            rightmax=max(rightmax,height[right]);
+            ans+=leftmax<rightmax? leftmax-height[left++]:rightmax-height[right--] ;
+        }
+        return ans;
+    }
+};
+// 注意 while 循环可以不加等号，因为在「谁小移动谁」的规则下，相遇的位置一定是最高的柱子，这个柱子是无法接水的。
+
+```
+
