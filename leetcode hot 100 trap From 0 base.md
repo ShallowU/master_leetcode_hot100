@@ -446,3 +446,77 @@ public:
 
 ```
 
+## p8[无重复字符的最长字串](https://leetcode.cn/problems/longest-substring-without-repeating-characters/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 首先是我的错误思路，只想到一半
+// "dvdf"这种就是错的，我的代码答案为2不是正确的3、
+// 错误代码：
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        if(s.size()==0) return 0;
+        if(s.size()==1) return 1;
+        int maxs=0;
+        int curs=0;
+        set<char> subs;
+        subs.insert(s[0]);
+        curs++;
+        for(int i=1;i<s.size();i++)
+        {
+            if(subs.find(s[i])==subs.end())
+            {
+                subs.insert(s[i]);
+                curs++;
+                maxs=max(curs,maxs);
+            }
+            else
+            {
+                curs=1;
+                maxs=max(curs,maxs);
+                subs.clear();
+                subs.insert(s[i]);
+            }
+        }
+        return maxs;
+        
+    }
+};
+// 错误原因：思路是从头扫描第一个字符，dv遇到d时候就舍弃了左边界全部从头开始了，所以最终是2，而正确思路是不断丢掉左边界的元素
+// 直到区间没有重复元素，比如dv遇到d时候就丢掉左边d，剩下vd，再遇到f就是vdf。
+// 我的错误思路是vd遇到d就直接从d从头开始
+
+模板：
+//外层循环扩展右边界，内层循环扩展左边界
+for (int l = 0, r = 0 ; r < n ; r++) {
+	//当前考虑的元素
+	while (l <= r && check()) {//区间[left,right]不符合题意
+        //扩展左边界
+    }
+    //区间[left,right]符合题意，统计相关信息
+}
+
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        if(s.size()==0) return 0;
+        unordered_set<char> subs;	// unordered_set效率比set更高效率不排序
+        int n=s.size();	//可以后续减少size的打字*_*
+        int ans=0;
+        for(int left=0,right=0;right<n;right++)	//外层循环处理右边界
+        {
+            char ch=s[right];
+            while(subs.count(ch))	// 处理不符合题意的左边界，不断收缩左边界使不含重复元素
+            {
+                subs.erase(s[left++]);
+            }
+            subs.insert(ch);	// 符合题意不断insert
+            ans=max(ans,right-left+1);
+        }
+        return ans;
+    }
+};
+```
+
+
+
