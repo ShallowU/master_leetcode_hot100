@@ -520,3 +520,76 @@ public:
 
 
 
+## p9[找到字符串中所有的字母异位词](https://leetcode.cn/problems/find-all-anagrams-in-a-string/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 错误解法，思路是一部分可以通过 50/65过，这里是用的set而不是multiset，会使
+s="ababababab"
+p="aab"
+有重复元素的检测错误，但即使继续用multiset也会很麻烦处理不了，只能放弃了呜呜呜呜
+看答案解题思路
+
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        int ns=s.size(),np=p.size();
+        if(np>ns)   return {};
+        set<char> str;
+        for(int i=0;i<np;i++)
+        {
+            str.insert(p[i]);
+        }
+        set<char> str1(str);
+        int left=0,right=0;
+        vector<int> ans;
+        for(;left<=ns-np;left++)
+        {
+            int tmp=left;
+            char ch=s[left];
+            right=left+np-1;
+            while(left<=right&&str.count(s[left]))
+            {
+                auto it=str.find(s[left]);
+                str.erase(it);
+                // str.erase(s[left]);
+                left++;
+                if(str.empty()) ans.push_back(tmp);
+            }
+            left=tmp;
+            str.clear();
+            for(auto it:str1)
+                str.insert(it);
+        }
+        return ans;
+    
+    }
+};
+
+// 正确思路
+// 归根揭底就是看这个np滑动区间中各个字母出现的次数是否相等，判断两个统计字母次数的vector是否相等
+// 用字符的ascii-a，范围在0-25(常见的字符统计技巧)
+// 每到一个np长度区间就进行比较，结束后都进行right++ left++到一个新区间
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        int ns=s.size(),np=p.size();
+        if(np>ns)   return {};
+        vector<int> ans;
+        vector<int> scount(26,0),pcount(26,0);
+        for(auto it:p)  pcount[it-'a']++;
+        int left=0,right=0;
+        for(;right<ns;right++)
+        {
+            scount[s[right]-'a']++;
+            if(right-left+1==np)
+            {
+                if(scount==pcount)  ans.push_back(left);
+                scount[s[left]-'a']--; // 记得减掉移走的left对应字母次数一次
+                left++;
+            }
+        }
+        return ans;
+    }
+};
+```
+
