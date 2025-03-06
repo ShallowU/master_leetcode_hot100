@@ -593,3 +593,75 @@ public:
 };
 ```
 
+## p10[和为k的子数组](https://leetcode.cn/problems/subarray-sum-equals-k/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+1 <= nums.length <= 2 * 10^4
+-1000 <= nums[i] <= 1000
+-107 <= k <= 107    
+// 例子中可能有负数
+// 这种下面暴力做法差最后一个示例，偶尔会超时 
+// 思路：就是枚举每一个值作为right，然后再遍历left中，试试加起来有值等于是否
+class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        if(nums.size()==0) return 0;
+        int n=nums.size();
+        int ans=0;
+        for(int i=0;i<n;i++)
+        {
+            int sum=0;
+            for(int j=i;j>=0;j--)  //for (int end = start; end < nums.size(); end++) 从左右遍历也行，以i为起始
+            {
+                sum+=nums[j];
+                if(sum==k)
+                    ans++;
+            }
+        }
+        return ans;
+    }
+};
+
+//
+// 定义 pre[i] 为 [0..i] 里所有数的和，则 pre[i] 可以由 pre[i−1] 递推而来，即：
+pre[i]=pre[i−1]+nums[i]
+那么「[j..i] 这个子数组和为 k 」这个条件我们可以转化为
+pre[i]−pre[j−1]==k
+简单移项可得符合条件的下标 j 需要满足
+pre[j−1]==pre[i]−k
+所以我们考虑以 i 结尾的和为 k 的连续子数组个数时只要统计有多少个前缀和为 pre[i]−k 的 pre[j] 即可。
+//
+前缀和的概念
+首先，我们使用一个叫做“前缀和”的概念。对于数组中的任何位置 j，前缀和 pre[j] 是数组中从第一个元素到第 j 个元素的总和。这意味着如果你想知道从元素 i+1 到 j 的子数组的和，你可以用 pre[j] - pre[i] 来计算。
+使用 Map 来存储前缀和
+在代码中，我们用一个 Map（哈希表）来存储每个前缀和出现的次数。这是为了快速检查某个特定的前缀和是否已经存在，以及它出现了多少次。
+核心逻辑解析
+当我们在数组中向前移动时，我们逐步增加 pre（当前的累积和）。对于每个新的 pre 值，我们检查 pre - k 是否在 Map 中：
+pre - k 的意义：这个检查的意义在于，如果 pre - k 存在于 Map 中，说明之前在某个点的累积和是 pre - k。由于当前的累积和是 pre，这意味着从那个点到当前点的子数组之和恰好是 k（因为 pre - (pre - k) = k）。
+如何使用这个信息：如果 pre - k 在 Map 中，那么 pre - k 出现的次数表示从不同的起始点到当前点的子数组和为 k 的不同情况。这是因为每一个 pre - k 都对应一个起点，使得从那个起点到当前点的子数组和为 k。
+因此，每当我们找到一个 pre - k 存在于 Map 中时，我们就把它的计数（即之前这种情况发生的次数）加到 count 上，因为这表示我们又找到了相应数量的以当前元素结束的子数组，其和为 k。
+ class Solution {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        if(nums.size()==0) return 0;
+        int ans=0;
+        int pre=0;
+        unordered_map<int,int> mp;
+        mp[0]=1; //为什么这样初始化？起始使防止pre[i]==k，区间全部就满足条件，这样就少加了一次
+        for(auto num:nums)
+        {
+            pre+=num;
+            if(mp.find(pre-k)!=mp.end())
+            {
+                ans+=mp[pre-k];
+            }
+            mp[pre]++;	// mp[pre]的值可能会有相同的，但是次数会增加
+        }
+        return ans;
+    }
+};
+
+
+    
+```
+
