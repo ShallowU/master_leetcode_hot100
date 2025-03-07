@@ -665,3 +665,87 @@ public:
     
 ```
 
+## p11[滑动窗口最大值](https://leetcode.cn/problems/sliding-window-maximum/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 暴力做法，复杂度O(nk)，不能过
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        vector<int> ans;
+        for(int i=0;i<=nums.size()-k;i++)
+        {
+            int j=i;
+            int maxnum=nums[i];
+            for(;j<=i+k-1;j++)
+            {
+                maxnum=max(maxnum,nums[j]);
+            }
+            ans.push_back(maxnum);
+        }
+        return ans;
+    }
+};
+
+// 使用multiset迭代器运用类似暴力的做法
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        if(nums.size()==0) return{};
+        vector<int> ans;
+        multiset<int> b(nums.begin(),nums.begin()+k);	//multiset有自动排序，且允许重复元素
+        // 该区间左闭由开，共k个元素，但只到nums[k-1]
+        // 初始化的迭代器指针
+        c.begin() 返回一个迭代器，它指向容器c的第一个元素
+
+        c.end() 返回一个迭代器，它指向容器c的最后一个元素的下一个位置
+
+        c.rbegin() 返回一个逆序迭代器，它指向容器c的最后一个元素
+
+        c.rend() 返回一个逆序迭代器，它指向容器c的第一个元素前面的位置            
+        //
+        ans.push_back(*b.rbegin()); //最后一个元素就是最大的
+        for(int i=1;i<nums.size()-k+1;i++)
+        {
+            b.erase(b.find(nums[i-1])); // 删掉上一个窗口的首值
+            b.insert(nums[i+k-1]);		// 插入新值
+            ans.push_back(*b.rbegin()); // 最大值
+        }
+        return ans;
+    }
+};
+
+// 使用优先队列
+https://blog.csdn.net/albertsh/article/details/108552268
+优先队列：本质是队列，但加上了排序，所以同时又是一个堆，默认构造是大顶堆，先出最大的元素，
+ 队列有：push（） pop() top() emplace() empoty() size()
+  经典优先队列问题就是数组前k大的数
+思想：类似裁员广进，每次出最大的数，但要判断该值是否在区间内。第一时间进入的值，不会删除旧的不在区间的值，会随着每次
+    pop判断是否是以前的区间值。所以需要下标就pair<int ,int>
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        if(nums.size()==0) return{};
+        vector<int> ans;
+        priority_queue<pair<int,int>> q;
+        for(int i=0;i<k;i++)
+        {
+            q.push(make_pair(nums[i],i));	//q.emplace(nums[i], i);直接构造
+        }
+        ans.push_back(q.top().first); // 第一个窗口最大值
+        for(int i=k;i<nums.size();i++)
+        {
+            q.push(make_pair(nums[i],i)); //先加入
+            while(q.top().second<=i-k)	// 判断当前最大值是否是以前区间的值
+            {
+                q.pop();
+            }
+            ans.push_back(q.top().first);
+        }
+        return ans;
+
+    }
+};
+
+```
+
