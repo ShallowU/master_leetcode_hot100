@@ -718,7 +718,9 @@ public:
 // 使用优先队列
 https://blog.csdn.net/albertsh/article/details/108552268
 优先队列：本质是队列，但加上了排序，所以同时又是一个堆，默认构造是大顶堆，先出最大的元素，
- 队列有：push（） pop() top() emplace() empoty() size()
+ 队列有：push（） pop() top() emplace() empity() size()
+  priority_queue<int>==priority_queue<int,vector<int>,less<int>>; //大根堆
+priority_queue<int,vector<int>,greater<int>>;// 小根堆
   经典优先队列问题就是数组前k大的数
 思想：类似裁员广进，每次出最大的数，但要判断该值是否在区间内。第一时间进入的值，不会删除旧的不在区间的值，会随着每次
     pop判断是否是以前的区间值。所以需要下标就pair<int ,int>
@@ -749,5 +751,123 @@ public:
 // 单调队列（优先队列）
 我悟了，队尾只要有更年轻（i越靠后）同时还能力更强（数值越大）的，留着其他比它更早入职同时能力却更差的没有什么意义，统统开了；队首的虽然能力最强，但是年龄最大，一旦发现它超过年龄范围（不在滑动窗口的范围内），不用看能力就可以直接开了。
  //
+```
+
+## p12[数组中第k个大元素](https://leetcode.cn/problems/kth-largest-element-in-an-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        // 前k大就用小根堆装k个，最后剩的就是前面k大的元素，第一个top就是第k大
+        // 反之前k小就用大根堆
+        priority_queue<int,vector<int>,greater<int>> q;
+        for(auto n:nums)
+        {
+            if(q.size()==k)
+            {
+                if(n>q.top())
+                {
+                    q.pop();
+                    q.push(n);
+                }
+            }
+            else
+                q.push(n);
+        }
+        int ans=0;
+        ans=q.top();
+        return ans;
+    }
+};
+```
+
+## p13[前k个高频元素](https://leetcode.cn/problems/top-k-frequent-elements/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 反正看到前k大就用优先队列，这里统计次数用map，放入优先队列时候放次数在前面，作为排序用次数排序，
+// 用默认的大根堆，先输出频率大的对应元素
+// 首先，这段代码是在遍历一个unordered_map<int, int>的mp。循环里用的是for(auto it:mp)，这样it应该是一个pair的副本，也就是每个元素是一个键值对的拷贝。这时候访问成员的写法应该是用点运算符，比如it.first和it.second，对吧？因为在这种情况下，it是一个对象，而不是指针或者迭代器。所以这里用it.second和it.first是正确的。
+// 那如果换成it->second的话，那应该是当it是一个指针或者迭代器的时候才能用。比如，如果循环写成for(auto it = mp.begin(); it != mp.end(); it++)，这时候it是一个迭代器，指向键值对，所以需要用->来访问成员，比如it->first和it->second。但是原来的代码中用的是范围for循环，所以每个it是一个pair类型的对象，而不是指针或者迭代器，所以应该用点操作符。
+// 7ms
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        int n=nums.size();
+        if(n==0) return {};
+        vector<int> ans;
+        unordered_map<int,int> mp;
+        for(auto n:nums)
+        {
+            if(mp.find(n)!=mp.end())
+            {
+                mp[n]++;
+            }
+            else
+            {
+                mp[n]=1;
+            }
+        }
+        priority_queue<pair<int,int>> q;
+        for(auto it=mp.begin();it!=mp.end();it++)
+        {
+            q.emplace(it->second,it->first); // 
+        }
+        int count=1;
+        while(!q.empty())
+        {
+            ans.push_back(q.top().second);
+            q.pop();
+            count++;
+            if(count>k)
+                break;
+        }
+        return ans;
+    }
+};
+// 用前k大元素的方式进行，这样这里用的小根堆
+// priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> q;
+// pair 格式书写！！！！！
+// 这样复杂度只有一半了 3 ms
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        int n=nums.size();
+        if(n==0) return {};
+        vector<int> ans;
+        unordered_map<int,int> mp;
+        for(auto n:nums)
+        {
+            if(mp.find(n)!=mp.end())
+            {
+                mp[n]++;
+            }
+            else
+            {
+                mp[n]=1;
+            }
+        }
+        priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> q;
+        for(auto it=mp.begin();it!=mp.end();it++)
+        {
+            if(q.size()==k)
+            {
+                if(it->second>q.top().first)
+                {
+                    q.pop();
+                    q.emplace(it->second,it->first);
+                }
+            }
+            else
+                q.emplace(it->second,it->first);
+        }
+        while(!q.empty())
+        {
+            ans.push_back(q.top().second);
+            q.pop();
+        }
+        return ans;
+    }
+};
 ```
 
