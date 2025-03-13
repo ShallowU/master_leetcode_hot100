@@ -871,3 +871,48 @@ public:
 };
 ```
 
+## p14[最大子数组和](https://leetcode.cn/problems/maximum-subarray/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 使用动态规划
+// 我们用 f(i) 代表以第 i 个数结尾的「连续子数组的最大和」，那么很显然我们要求的答案就是：
+因此我们只需要求出每个位置的 f(i)，然后返回 f 数组中的最大值即可。那么我们如何求 f(i) 呢？我们可以考虑 nums[i] 单独成为一段还是加入 f(i−1) 对应的那一段，这取决于 nums[i] 和 f(i−1)+nums[i] 的大小，我们希望获得一个比较大的，于是可以写出这样的动态规划转移方程：
+f(i)=max{f(i−1)+nums[i],nums[i]}
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) 
+    {
+        vector<int> maxi(nums);//以i结尾索引数组的连续子数组最大和
+        for(int i=1;i<nums.size();i++)
+        {
+            maxi[i]=max(nums[i],maxi[i-1]+nums[i]);
+        }
+        return *max_element(maxi.begin(),maxi.end());//快速找迭代器最大值最小值
+    }
+};
+
+// 使用前缀和
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) 
+    {
+        // 使用前缀和，区间的和等于两个前缀和相减
+        // 所以区间和最大值等于当前前缀和-前面最小前缀和
+        // 初始最小前缀和为0
+        int ans=INT_MIN;
+        int pre_num=0;
+        int min_pre_num=0;
+        for(auto x:nums)
+        {
+            pre_num+=x; // 当前前缀和
+            ans=max(pre_num-min_pre_num,ans); // 当前前缀和减去前缀和的最小值
+            min_pre_num=min(pre_num,min_pre_num); // 更新最小前缀和
+        }
+        return ans;
+    }
+};
+```
+
+
+
