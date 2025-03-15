@@ -914,5 +914,51 @@ public:
 };
 ```
 
+## p15[合并区间](https://leetcode.cn/problems/merge-intervals/description/?envType=study-plan-v2&envId=top-100-liked)
 
+```c++
+题目：
+以数组 intervals 表示若干个区间的集合，其中单个区间为 intervals[i] = [starti, endi] 。请你合并所有重叠的区间，并返回 一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间 。
+示例 1：
+输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+输出：[[1,6],[8,10],[15,18]]
+解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+// 先进行排序，让一维vector的按左端点值从小到大排序，便于后续比较和跳过
+// 如果后一个一维vector的左端点值在当前寻找的一维vector区间中，并且一维vector的右端点值大于当前寻找的一维vector右端点值
+// 则可以选择一个maxrightnum=max(maxrightnum,intervals[j][jright]);
+ //   最后push{intervals[i][0],maxrightnum}，如果没有满足上述条件就push本身
+
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(),intervals.end());
+        vector<vector<int>> ans;
+        for(int i=0;i<intervals.size();i++)
+        {
+            vector<int>tmp(intervals[i]);
+            int skipcount=1; // 中间一些小区间包含于当前寻找的区间，后面可以直接跳过
+            int iright=intervals[i].size()-1;
+            int maxrightnum=intervals[i][iright];
+            vector<int> res;
+            for(int j=i+1;j<intervals.size();j++)
+            {
+                int jright=intervals[j].size()-1;
+                if(intervals[j][0]<=maxrightnum) // 一直遍历左端点是否小于当前融合区间的右端点（即最大值
+                {
+                    maxrightnum=max(maxrightnum,intervals[j][jright]);
+                    skipcount++;
+                }
+                else
+                    break;   
+            }
+            if(skipcount==1)
+                ans.push_back(tmp); // 没有合并，push本身
+            else
+                ans.push_back({intervals[i][0],maxrightnum});
+            i+=skipcount-1;
+        }
+        return ans;
+    }
+};
+```
 
