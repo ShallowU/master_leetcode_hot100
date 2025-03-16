@@ -962,3 +962,47 @@ public:
 };
 ```
 
+## p16[轮转数组](https://leetcode.cn/problems/rotate-array/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+//  第一想到做法就是找规律，但要多开销一个数组
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        k=k%nums.size();
+        int differ=nums.size() -k;
+        vector<int> tmp;
+        for(int i=differ;i<nums.size();i++)
+        {
+            tmp.push_back(nums[i]);
+        }
+        for(int i=0;i<differ;i++)
+        {
+            tmp.push_back(nums[i]);
+        }
+        for(int i=0;i<nums.size();i++)
+        {
+            nums[i]=tmp[i];
+        }
+    }
+};
+
+// o(1)的空间复杂度，但是超时了，差最后一个测试样例
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        k=k%nums.size();
+        while(k>0)
+        {
+            int x=nums[nums.size()-1];
+            for(int i=nums.size()-1;i>=1;i--)
+            {
+                nums[i]=nums[i-1];
+            }
+            nums[0]=x;
+            k--;
+        }
+    }
+};
+```
+
