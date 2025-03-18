@@ -1006,3 +1006,68 @@ public:
 };
 ```
 
+## p17[除自身以外数组的乘积](https://leetcode.cn/problems/product-of-array-except-self/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+class Solution {
+public:
+    vector<int> productExceptSelf(vector<int>& nums) {
+        // 类似分治的思想
+        // 乘积等于左边所有数的乘积和右边所有数的乘积再乘积
+        // 先求出左右数的乘积保存起来，以空间换时间
+        int n=nums.size();
+        vector<int> l(n),r(n);
+        vector<int> ans(n);
+        l[0]=1;
+        for(int i=1;i<n;i++)
+        {
+            l[i]=l[i-1]*nums[i-1];
+        }
+        r[n-1]=1;
+        for(int i=n-2;i>=0;i--)
+        {
+            r[i]=r[i+1]*nums[i+1];
+        }
+        for(int i=0;i<n;i++)
+        {
+            ans[i]=l[i]*r[i];
+        }
+        return ans;
+
+    }
+};
+```
+
+## p18[矩阵置0](https://leetcode.cn/problems/set-matrix-zeroes/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        // 本质上进行标记，标记有0出现的行和0出现的列
+        // 然后遍历原数组，如果该元素位于该行或者该列那就置0
+        int m=matrix.size();
+        int n=matrix[0].size();
+        vector<int> row(m,0),col(n,0);
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<n;j++)
+            {
+                if(matrix[i][j]==0)
+                {
+                    row[i]=col[j]=1;
+                }
+            }
+        }
+        for(int i=0;i<m;i++)
+        {
+            for(int j=0;j<n;j++)
+            {
+                if(row[i]||col[j])
+                    matrix[i][j]=0;
+            }
+        }
+    }
+};
+```
+
