@@ -1071,3 +1071,47 @@ public:
 };
 ```
 
+## p18[螺旋矩阵](https://leetcode.cn/problems/spiral-matrix/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 首先这道可以学到很多，值得深挖多种解决方案
+// 应用方向数组进行解决这非常重要，每遇到边界以外或者以及visit的元素就顺时针调整一下方向
+// int direct[4][2]={{0,1},{1,0},{0,-1},{-1,0}};4个标记方向，使用index来转变，第一个元素是行，第二个是列，首先{0,1}是行不变，col+1，同理
+// {1,0}是row+1，col不变，
+// 判断是否所有结束了，就是共添加了m*n元素就是
+// 为了避免回到以前添加过的元素，需要设置visted数组进行标记，下一个元素是visted过的，则要进行顺时针旋转了
+
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int m=matrix.size();
+        int n=matrix[0].size();
+        vector<int> ans; // vector<int> ans(m*n)
+        int direct[4][2]={{0,1},{1,0},{0,-1},{-1,0}};
+        vector<vector<int>> visited(m,vector<int>(n,0));
+        // or int visited[m][n];
+        //  memset(visited,0,sizeof(visited))
+         
+        int total=m*n;
+
+        int row=0,col=0;
+        int idex=0;
+        for(int i=0;i<total;i++)
+        {
+            ans.push_back(matrix[row][col]); // ans[i]=matrix[row][col]
+            visited[row][col]=1; // 经过以后设置为1
+            int nextrow=row+direct[idex][0];
+            int nextcol=col+direct[idex][1];
+            // 数组界限都是0-m-1，0-n-1，所以遇到m或者n就是越界了，！！！！
+            if(nextrow<0||nextrow>=m||nextcol<0||nextcol>=n||visited[nextrow][nextcol]==1)
+                idex=(idex+1)%4;// 要mod4，因为index会循环，大于4就灭有意义了
+            row+=direct[idex][0];
+            col+=direct[idex][1];
+
+        }
+        return ans;
+        
+    }
+};
+```
+
