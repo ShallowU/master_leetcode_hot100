@@ -1115,3 +1115,55 @@ public:
 };
 ```
 
+## p19[旋转图像](https://leetcode.cn/problems/rotate-image/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 找规律，会发现旋转后的位置与之前的行 列相关
+// 具体是matrix[i][j] -> matrix_new[j][n - i - 1],但这里开辟了新空间而不是原地旋转
+
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        // C++ 这里的 = 拷贝是值拷贝，会得到一个新的数组
+        auto matrix_new = matrix;
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                matrix_new[j][n - i - 1] = matrix[i][j];
+            }
+        }
+        // 这里也是值拷贝
+        matrix = matrix_new;
+    }
+};
+
+// 原地旋转
+// 先进行转置再逆序
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n=matrix.size();
+        //  矩阵转置
+        for(int i=0;i<n;i++)
+        {
+            for(int j=0;j<i;j++) // 转置下标是将倒三角的一半进行对换
+            {
+                swap(matrix[i][j],matrix[j][i]);
+            }
+        }
+        // 每行对称交换或者逆序
+        // for(int i=0;i<n;i++)
+        // {
+        //     reverse(&matrix[i][0],&matrix[i][0]+n);
+        // }
+        for(auto &it:matrix)
+            reverse(it.begin(),it.end());
+    }
+};
+
+使用 for(auto &it: matrix)：it 是引用，修改 it 会修改 matrix 中的原始数据。
+
+使用 for(auto it: matrix)：it 是副本，修改 it 不会影响 matrix 中的原始数据。
+    如果是将it指向的值添加到其他位置或者容器中，两者选择均可，如果原地修改只能是&
+```
+
