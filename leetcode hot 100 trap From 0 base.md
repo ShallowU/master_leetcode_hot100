@@ -1167,3 +1167,66 @@ public:
     如果是将it指向的值添加到其他位置或者容器中，两者选择均可，如果原地修改只能是&
 ```
 
+## p20[岛屿数量](https://leetcode.cn/problems/number-of-islands/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 很传统的dfs，但是这里是网状结构而不是二叉树
+void dfs(原二维数组，visited[]，r，c)
+{
+    判断r ，c是否超过边界
+        return；
+        
+     判断是否visited
+        return；
+        
+      visited[r][c]=1;
+    
+    if(该二维数组元素是我们需要判断的值)
+    {
+		上下左右
+         四个方向进行递归dfs（）
+    }
+    
+}
+
+class Solution {
+public:
+    void dfs(vector<vector<char>>& grid,vector<vector<int>> &visited,int r,int c)
+    {
+        int nr=grid.size();
+        int nc=grid[0].size();
+        if(r<0||r>=nr||c<0||c>=nc)
+            return;
+        if(visited[r][c]==1)
+            return;
+        visited[r][c]=1;
+        if(grid[r][c]=='0')
+            return;
+        dfs(grid,visited,r-1,c);
+        dfs(grid,visited,r+1,c);
+        dfs(grid,visited,r,c+1);
+        dfs(grid,visited,r,c-1);
+    }
+    int numIslands(vector<vector<char>>& grid) {
+        int nr=grid.size();
+        int nc=grid[0].size();
+        vector<vector<int>> visited(nr,vector<int>(nc,0));
+        int ans=0;
+        for(int i=0;i<nr;i++)
+        {
+            for(int j=0;j<nc;j++)
+            {
+                if(grid[i][j]=='1'&&visited[i][j]==0)
+                {
+                    ans++;
+                    dfs(grid,visited,i,j);
+                }
+            }
+        }
+        return ans;
+    }
+};
+```
+
+
+
