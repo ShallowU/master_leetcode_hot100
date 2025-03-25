@@ -1230,3 +1230,111 @@ public:
 
 
 
+## 21[腐烂的橘子](https://leetcode.cn/problems/rotting-oranges/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// bfs 按层进行搜索，利用queue进行，每一次遍历len(queue.size)的n个元素再将其子节点插入队尾，直至队列元素为空
+// 注意点：由于是网格搜索 需要四个方向向量，由于需要记录下横纵坐标 所以需要pair<int,int>
+// pair插入 {} 以及.first .second
+// 适当时候可以添加visited
+// 此题按照腐烂的橘子一层层遍历搜索，刚开始从初始的烂橘子开始，再扩展到新添加的烂橘子这一层
+class Solution {
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+        int nr=grid.size();
+        int nc=grid[0].size();
+        int directions[4][2]={{-1,0},{1,0},{0,-1},{0,1}};
+        queue<pair<int,int>> q;
+        int freshcount=0; //记录新鲜橘子个数
+        for(int i=0;i<nr;i++)
+        {
+            for(int j=0;j<nc;j++)
+            {
+                if(grid[i][j]==2)
+                    q.push({i,j});
+                else if(grid[i][j]==1)
+                    freshcount++;
+            }
+        }
+        if(freshcount==0) //没有新鲜橘子就0分钟腐烂
+            return 0;
+        if(q.empty()&&freshcount) //没有烂橘子有新鲜橘子就-1return
+            return -1;
+        int ans=0;
+        while(!q.empty())
+        {
+            int n=q.size(); //每层数量
+            for(int i=0;i<n;i++)
+            {
+                pair<int,int> p=q.front(); //取出对头元素
+                q.pop();// 弹出
+                for(auto it:directions)// 遍历四个方向等价为for(int *it:directions)
+                {
+                    int x=p.first+it[0];
+                    int y=p.second+it[1];
+                    if(x>=0&&x<nr&&y>=0&&y<nc&&grid[x][y]==1)
+                    {
+                        grid[x][y]=2;
+                        q.push({x,y});
+                        freshcount--;
+                    }
+                }
+            }
+            if(!q.empty()) //由于最后一层没有添加新橘子 所以ans不要多加1 
+                ans++;
+        }
+        if(freshcount==0)
+            return ans;
+        else
+            return -1;
+    }
+};
+```
+
+## p22[课程表](https://leetcode.cn/problems/course-schedule/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 由于考虑先后关系像课程表、工程调度问题都需要拓扑排序进行处理
+// 这里使用入度为0思想进行处理，即使用广度优先 和queue
+// 总节点个数就是numCourses
+
+
+
+
+
+class Solution {
+public:
+    // 使用广度优先遍历实现拓扑排序更加清晰
+    // 广度优先采用的从入度这个思想即入度为0
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> edges(numCourses); //相当于邻接表
+        vector<int> indegree(numCourses,0); // 入度表
+        for(int i=0;i<prerequisites.size();i++)
+        {
+            edges[prerequisites[i][1]].push_back(prerequisites[i][0]);// 后往前是边的方向
+            indegree[prerequisites[i][0]]++;
+        }
+        queue<int> q;
+        for(int i=0;i<indegree.size();i++) // 初始化第一步入度为0的节点
+        {
+            if(indegree[i]==0)
+                q.push(i);
+        }
+        int count=0; //判断总个数是否为跟numCourses相同
+        while(!q.empty())
+        {
+            int front=q.front();
+            q.pop();
+            count++;
+            for(auto it:edges[front])
+            {
+                indegree[it]--;
+                if(indegree[it]==0) //新的入度为0的点
+                    q.push(it);
+            }
+        }
+        return count==numCourses;
+    }
+};
+```
+
