@@ -1338,3 +1338,105 @@ public:
 };
 ```
 
+## p23[前缀树or字典树](https://leetcode.cn/problems/implement-trie-prefix-tree/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 要理解this指针概念以及指针数组概念
+class Trie {
+public:
+    bool isend=false;
+    Trie* son[26];
+
+    Trie() {
+       isend=false;
+       memset(son,0,sizeof(son)) ;
+    }
+    
+    void insert(string word) {
+        Trie* root=this;
+        for(char ch:word)
+        {
+            if(root->son[ch-'a']==nullptr)
+            {
+                root->son[ch-'a']=new Trie();
+            }
+            root=root->son[ch-'a'];
+        }
+        root->isend=true;
+    }
+    
+    bool search(string word) {
+        Trie* root=this;
+        for(char ch:word)
+        {
+            if(root->son[ch-'a']==nullptr)
+            {
+                return false;
+            }
+            else
+            {
+                root=root->son[ch-'a'];
+            }
+        }
+        return root->isend;
+    }
+    
+    bool startsWith(string prefix) {
+        Trie* root=this;
+        for(char ch:prefix)
+        {
+            if(root->son[ch-'a']==nullptr)
+            {
+                return false;
+            }
+            else
+            {
+                root=root->son[ch-'a'];
+            }
+        }
+        return true;
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+```
+
+## p24[买卖股票最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 用的之前多开vector<int> l(n),r(n);分别存储左边的最小值和右边的最大值
+// 与p17解法相似
+
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n=prices.size();
+        vector<int> l(n),r(n);
+        l[0]=prices[0];
+        for(int i=1;i<n;i++)
+        {
+            l[i]=min(l[i-1],prices[i]);
+        }
+        r[n-1]=prices[n-1];
+        for(int i=n-2;i>=0;i--)
+        {
+            r[i]=max(r[i+1],prices[i]);
+        }
+        int maxnum=INT_MIN;
+        for(int i=0;i<n;i++)
+        {
+            maxnum=max(r[i]-l[i],maxnum);
+        }
+        if(maxnum<=0)
+            return 0;
+        return maxnum;
+    }
+};
+```
+
