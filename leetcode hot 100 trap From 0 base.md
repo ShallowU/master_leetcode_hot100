@@ -1440,3 +1440,47 @@ public:
 };
 ```
 
+## p25[跳跃游戏](https://leetcode.cn/problems/jump-game/description/?envType=study-plan-v2&envId=top-100-liked)
+
+```c++
+// 贪心算法思想：记录maxright是到达最远的边界，maxright如果比当前下标i还小，说明就到不了i，就更到不了最后
+// 只有先i小于等于maxright，就可以一直更新maxright
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n=nums.size();
+        int maxright=0+nums[0];// 最开始到达最远的地方就是0+nums[0]，如果maxright一直不更新，那i也往前走不了
+        for(int i=0;i<n;i++)
+        {
+            if(i<=maxright)
+            {
+                maxright=max(maxright,i+nums[i]);
+                if(maxright>=n-1)
+                    return true;
+            }
+        }
+        return false;
+    }
+};
+// 动态规划
+// dp[i]是代表以i结尾的最远到达的下标dp[i-1]
+// 但是注意一定要i《=dp[i-1]，不然连i都到不了则最后的下标更到达不了
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int n=nums.size();
+        vector<int> dp(n);
+        dp[0]=nums[0];
+        for(int i=1;i<n;i++)
+        {
+            if(i>dp[i-1])
+                return false;
+            dp[i]=max(dp[i-1],i+nums[i]);
+        }
+        int ans=dp[n-1];
+        if(ans>=n-1) return true;
+        else return false;
+    }
+};
+```
+
